@@ -1,69 +1,57 @@
-import { useState, memo, useMemo, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import "./App.css";
-import { getData } from "./server/http";
+import ErrorBoundary from "antd/es/alert/ErrorBoundary";
+import { Await } from "react-router-dom";
+import { IAwaitComponentProps } from "./global-type";
 
-const Child = memo((props: any) => {
-  const { data } = props;
-  console.log("child render...", data.name);
+const AwaitComponent = (props: IAwaitComponentProps) => {
+  const [message, setMessage] = useState("Who are you?");
+  const { resolver } = props;
 
-  const userInfo = {
-    name: "lucas",
-    age: 28,
-    description: "He is a programmer. He likes coding.",
-  };
-
-  sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
-
-  console.log("sessiongStorage");
-
-  console.log(
-    "sessionStorage--->",
-    JSON.parse(sessionStorage?.getItem("userInfo") ?? "{}")
-  );
-  return (
-    <div>
-      <div>Child</div>
-      <div>{data.name}</div>
-    </div>
-  );
-});
-
-function App() {
-  console.log("App render...");
-  const [count, setCount] = useState(0);
-  const [name, setName] = useState("rose");
-
-  const data = useMemo(() => {
-    return {
-      name,
-    };
-  }, [name]);
-
-  const getQueryData = async (url: string, query = {}) => {
-    let result;
-    // The code in the try block is executed first, and if it throws an exception, the code in the catch block will be executed.
-    try {
-      result = await getData(url, query);
-      console.log("result--->", result);
-    } catch (error) {
-      // If the Promise is rejected, the await expression throws the rejected value.
-      console.log("error--->", error);
-    }
+  const getMessage = async () => {
+    resolver.then((data: any) => {
+      setMessage(data.data.title);
+    });
   };
 
   useEffect(() => {
-    // getQueryData("/query", { username: "lucas" });
+    console.log("AwaitComponent Mount!!");
+    getMessage();
+  }, []);
+
+  return <div>{message}</div>;
+};
+
+const AwaitChild = (props: any) => {
+  const [message, setMessage] = useState("Who are you?");
+  const { data } = props;
+  console.log("🚀 ~ file: App.tsx:34 ~ AwaitChild ~ data:", data);
+  useEffect(() => {
+    setMessage(data.data.title);
+  }, []);
+  return <div>{message}</div>;
+};
+
+const promise = fetch("http://localhost:8989/msg", {
+  headers: new Headers({ "Content-Type": "application/json" }),
+}).then((response) => response.json());
+
+function App() {
+  useEffect(() => {
+    console.log("fetcher changed!!");
   }, []);
 
   return (
-    <>
-      <div>
-        <div>{count}</div>
-        <button onClick={() => setCount(count + 1)}>Update count</button>
-        <button onClick={() => setName(name + "@")}>Update name</button>
-        <Child data={data} />
-      </div>
-    </>
+    <Suspense fallback={<div>loading</div>}>
+      <ErrorBoundary>
+        <AwaitComponent resolver={promise}></AwaitComponent>
+        <Await
+          resolve={promise}
+          errorElement={<div>Could not load reviews.</div>}
+          children={(resolvedReviews) => <AwaitChild data={resolvedReviews} />}
+        ></Await>
+      </ErrorBoundary>
+    </Suspense>
   );
 }
 

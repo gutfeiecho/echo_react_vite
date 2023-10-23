@@ -5,7 +5,11 @@ import App from "./App.tsx";
 import "./index.css";
 import Discount from "./pages/discount/index.tsx";
 import DiscountHooks from "./pages/discount-hooks/index.tsx";
-import MemoContainer from "./pages/memo/index.tsx";
+import UseMemoContainer from "./pages/demo-useMemo/index.tsx";
+import ModalDemoContainer from "./pages/demo-modal/index.tsx";
+import PropsChildrenContainer from "./pages/demo-props/index.tsx";
+import UseCallbackContainer from "./pages/demo-useCallback/index.tsx";
+import MemoContainer from "./pages/demo-memo/index.tsx";
 
 // console.log("process", process); // Uncaught ReferenceError: process is not defined
 
@@ -32,13 +36,27 @@ const router = createBrowserRouter([
     element: <DiscountHooks />,
   },
   {
-    path: "/memo",
+    path: "/demo-useMemo",
+    element: <UseMemoContainer />,
+  },
+  {
+    path: "/demo-modal",
+    element: <ModalDemoContainer />,
+  },
+  {
+    path: "/demo-props",
+    element: <PropsChildrenContainer />,
+  },
+  {
+    path: "/demo-useCallback",
+    element: <UseCallbackContainer />,
+  },
+  {
+    path: "/demo-memo",
     element: <MemoContainer />,
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  <RouterProvider router={router} />
 );

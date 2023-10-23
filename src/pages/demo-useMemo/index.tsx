@@ -5,7 +5,7 @@ const CountriesList = () => {
   return <div>countries list, always re-renders</div>;
 };
 
-const MemoContainer = () => {
+const UseMemoContainer = () => {
   const [counter, setCounter] = useState<number>(1);
   const list = useMemo(() => {
     return <CountriesList />;
@@ -22,4 +22,4 @@ const MemoContainer = () => {
   );
 };
 
-export default MemoContainer;
+export default UseMemoContainer;
